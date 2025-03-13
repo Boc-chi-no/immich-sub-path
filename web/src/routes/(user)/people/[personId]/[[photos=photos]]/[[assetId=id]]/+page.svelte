@@ -109,7 +109,7 @@
     const action = $page.url.searchParams.get(QueryParameter.ACTION);
     const getPreviousRoute = $page.url.searchParams.get(QueryParameter.PREVIOUS_ROUTE);
     if (getPreviousRoute && !isExternalUrl(getPreviousRoute)) {
-      previousRoute = getPreviousRoute;
+      previousRoute = `#${getPreviousRoute}`;
     }
     if (action == 'merge') {
       viewMode = PersonPageViewMode.MERGE_PEOPLE;

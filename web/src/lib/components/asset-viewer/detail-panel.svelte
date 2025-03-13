@@ -229,8 +229,8 @@
             <a
               class="w-[90px]"
               href="?{QueryParameter.PREVIOUS_ROUTE}={currentAlbum?.id
-                                    ? `${AppRoute.ALBUMS}/${currentAlbum?.id}`
-                                    : AppRoute.PHOTOS}{AppRoute.PEOPLE}/{person.id}"
+                                    ? `${AppRoute.ALBUMS.slice(1)}/${currentAlbum?.id}`
+                                    : AppRoute.PHOTOS.slice(1)}{AppRoute.PEOPLE}/{person.id}"
               onfocus={() => ($boundingBoxesArray = people[index].faces)}
               onblur={() => ($boundingBoxesArray = [])}
               onmouseover={() => ($boundingBoxesArray = people[index].faces)}
