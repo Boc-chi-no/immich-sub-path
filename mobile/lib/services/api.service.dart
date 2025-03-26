@@ -31,9 +31,13 @@ class ApiService implements Authentication {
   late DownloadApi downloadApi;
   late TrashApi trashApi;
   late StacksApi stacksApi;
+  late ViewApi viewApi;
   late MemoriesApi memoriesApi;
 
   ApiService() {
+    // The below line ensures that the api clients are initialized when the service is instantiated
+    // This is required to avoid late initialization errors when the clients are access before the endpoint is resolved
+    setEndpoint('');
     final endpoint = Store.tryGet(StoreKey.serverEndpoint);
     if (endpoint != null && endpoint.isNotEmpty) {
       setEndpoint(endpoint);
@@ -64,6 +68,7 @@ class ApiService implements Authentication {
     downloadApi = DownloadApi(_apiClient);
     trashApi = TrashApi(_apiClient);
     stacksApi = StacksApi(_apiClient);
+    viewApi = ViewApi(_apiClient);
     memoriesApi = MemoriesApi(_apiClient);
   }
 
@@ -167,11 +172,14 @@ class ApiService implements Authentication {
       authenticationApi.apiClient
           .addDefaultHeader('deviceModel', iosInfo.utsname.machine);
       authenticationApi.apiClient.addDefaultHeader('deviceType', 'iOS');
-    } else {
+    } else if (Platform.isAndroid) {
       final androidInfo = await deviceInfoPlugin.androidInfo;
       authenticationApi.apiClient
           .addDefaultHeader('deviceModel', androidInfo.model);
       authenticationApi.apiClient.addDefaultHeader('deviceType', 'Android');
+    } else {
+      authenticationApi.apiClient.addDefaultHeader('deviceModel', 'Unknown');
+      authenticationApi.apiClient.addDefaultHeader('deviceType', 'Unknown');
     }
   }
 

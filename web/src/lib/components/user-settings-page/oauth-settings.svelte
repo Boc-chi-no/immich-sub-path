@@ -6,10 +6,11 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { handleError } from '../../utils/handle-error';
-  import Button from '../elements/buttons/button.svelte';
   import LoadingSpinner from '../shared-components/loading-spinner.svelte';
   import { notificationController, NotificationType } from '../shared-components/notification/notification';
   import { t } from 'svelte-i18n';
+  import { Button } from '@immich/ui';
+
   import { addSearchParams } from '$lib/utils';
 
   interface Props {
@@ -63,9 +64,11 @@
         </div>
       {:else if $featureFlags.oauth}
         {#if user.oauthId}
-          <Button size="sm" onclick={() => handleUnlink()}>{$t('unlink_oauth')}</Button>
+          <Button shape="round" size="small" onclick={() => handleUnlink()}>{$t('unlink_oauth')}</Button>
         {:else}
-          <Button size="sm" onclick={() => oauth.authorize(globalThis.location)}>{$t('link_to_oauth')}</Button>
+          <Button shape="round" size="small" onclick={() => oauth.authorize(globalThis.location)}
+            >{$t('link_to_oauth')}</Button
+          >
         {/if}
       {/if}
     </div>
