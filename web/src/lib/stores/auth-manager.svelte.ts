@@ -20,7 +20,7 @@ class AuthManager {
 
     try {
       if (redirectUri.startsWith('/')) {
-        await goto(redirectUri);
+        await goto(`#${redirectUri}`);
       } else {
         globalThis.location.href = redirectUri;
       }
