@@ -23,7 +23,7 @@
   const url = new URL(location.href);
   if (url.searchParams.get('token')) {
     url.searchParams.delete('token');
-    history.replaceState({}, document.title, url);
+    history.replaceState(history.state, document.title, url);
   }
 
   const end = () =>

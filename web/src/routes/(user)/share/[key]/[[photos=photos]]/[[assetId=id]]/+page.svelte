@@ -9,4 +9,6 @@
   let { data }: Props = $props();
 </script>
 
-<SharedLinkPage {data} />
+{#key data.key ?? data.slug}
+  <SharedLinkPage {data} />
+{/key}

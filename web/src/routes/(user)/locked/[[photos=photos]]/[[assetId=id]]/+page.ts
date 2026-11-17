@@ -1,5 +1,6 @@
 import { Route } from '#lib/route.ts';
 import { authenticate } from '#lib/utils/auth.ts';
+import { routeHref } from '#lib/utils/hash-routing.ts';
 import { getFormatter } from '#lib/utils/i18n.ts';
 import { getAuthStatus } from '@immich/sdk';
 import { redirect } from '@sveltejs/kit';
@@ -10,7 +11,7 @@ export const load = (async ({ url }) => {
 
   const { isElevated, pinCode } = await getAuthStatus();
   if (!isElevated || !pinCode) {
-    redirect(307, Route.pinPrompt({ continue: url.pathname + url.search }));
+    redirect(307, Route.pinPrompt({ continue: routeHref(url) }));
   }
 
   const $t = await getFormatter();

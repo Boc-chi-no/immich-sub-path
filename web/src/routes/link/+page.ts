@@ -1,5 +1,6 @@
 import { OpenQueryParam } from '#lib/constants.ts';
 import { Route } from '#lib/route.ts';
+import { appUrl } from '#lib/utils/hash-routing.ts';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
@@ -39,7 +40,7 @@ export const load = (({ url }) => {
       // https://my.immich.app/link?target=activate_license&licenseKey=IMCL-9XC3-T4S3-37BU-GGJ5-8MWP-F2Y1-BGEX-AQTF
       const licenseKey = queryParams.get('licenseKey');
       const activationKey = queryParams.get('activationKey');
-      const redirectUrl = new URL(Route.buy(), url.origin);
+      const redirectUrl = appUrl(Route.buy());
 
       if (licenseKey) {
         redirectUrl.searchParams.append('licenseKey', licenseKey);

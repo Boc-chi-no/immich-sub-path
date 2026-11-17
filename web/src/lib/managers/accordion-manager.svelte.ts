@@ -27,7 +27,7 @@ class AccordionManager {
       this.#searchParams.set(QueryParameter.IS_OPEN, [...this.#state].join(' '));
     }
 
-    handlePromiseError(goto(`?${this.#searchParams.toString()}`, { replace: true, reset: false }));
+    handlePromiseError(goto(`?${this.#searchParams.toString()}${page.url.hash}`, { replace: true, reset: false }));
   }
 
   open(key: string) {

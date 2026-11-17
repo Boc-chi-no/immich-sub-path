@@ -311,7 +311,7 @@
       </div>
       <Button
         leadingIcon={mdiEyeOutline}
-        onclick={() => goto('/people/manage')}
+        onclick={() => goto(Route.managePeople())}
         size="small"
         variant="ghost"
         color="secondary">{$t('show_and_hide_people')}</Button

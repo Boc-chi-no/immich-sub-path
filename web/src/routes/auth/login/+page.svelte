@@ -110,7 +110,7 @@
         (publicConfig.oauth.autoLaunch && !oauth.isAutoLaunchDisabled(location)) ||
         oauth.isAutoLaunchEnabled(location)
       ) {
-        await goto(Route.login({ autoLaunch: 0 }), { replaceState: true });
+        await goto(Route.login({ continue: String(data.continueUrl), autoLaunch: 0 }), { replace: true });
         await oauth.authorize(location);
         return;
       }

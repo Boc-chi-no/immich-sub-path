@@ -5,6 +5,7 @@
   import HelpAndFeedbackModal from '#lib/modals/HelpAndFeedbackModal.svelte';
   import { getAboutInfoQuery } from '#lib/queries/server-info.query.ts';
   import { Route } from '#lib/route.ts';
+  import { routePath } from '#lib/utils/hash-routing.ts';
   import { Button, Icon, IconButton, modalManager } from '@immich/ui';
   import { mdiCog, mdiLogout, mdiPencil, mdiWrench } from '@mdi/js';
   import { createQuery } from '@tanstack/svelte-query';
@@ -79,7 +80,7 @@
           variant="ghost"
           size="small"
           color="secondary"
-          aria-current={page.url.pathname.includes('/admin') ? 'page' : undefined}
+          aria-current={routePath(page.url).includes('/admin') ? 'page' : undefined}
           class="border hover:bg-immich-primary/10 dark:border-immich-dark-gray dark:bg-gray-500 dark:text-white dark:hover:bg-immich-dark-primary/50"
         >
           <div class="flex place-content-center place-items-center gap-2 px-2 text-center">

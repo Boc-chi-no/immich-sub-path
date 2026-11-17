@@ -4,9 +4,9 @@ import { queryClient } from '#lib/queries/client.ts';
 import { getNotificationsQuery } from '#lib/queries/notification.query.ts';
 import { getServerConfigQuery } from '#lib/queries/server-info.query.ts';
 import { searchUsersAdminQuery } from '#lib/queries/user-admin.query.ts';
-import { Route } from '#lib/route.ts';
 import { maintenanceStore } from '#lib/stores/maintenance.store.ts';
 import { createEventEmitter } from '#lib/utils/eventemitter.ts';
+import { appUrl, routePath } from '#lib/utils/hash-routing.ts';
 import {
   MaintenanceAction,
   type AssetResponseDto,
@@ -49,7 +49,7 @@ export interface Events {
 }
 
 const websocket: Socket<Events> = io({
-  path: '/api/socket.io',
+  path: appUrl('api/socket.io').pathname,
   transports: ['websocket'],
   reconnection: true,
   forceNew: true,
@@ -111,7 +111,7 @@ export const openWebsocketConnection = () => {
     if (
       authManager.authenticated ||
       get(websocketStore.serverRestarting) ||
-      page.url.pathname.startsWith(Route.maintenanceMode())
+      routePath(page.url).startsWith('/maintenance')
     ) {
       websocket.connect();
     }

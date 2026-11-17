@@ -1,14 +1,38 @@
 <!doctype html>
 <html class="dark">
   <head>
+    <meta charset="utf-8" />
     <!-- (used for SSR) -->
     <!-- metadata:tags -->
 
-    <meta charset="utf-8" />
+    <script>
+      // Relative resources require a directory URL, including on a first visit.
+      if ((location.search.includes('code=') || location.search.includes('error=')) && !location.hash) {
+        const saved = sessionStorage.getItem('immich-oauth-route') || '#/auth/login';
+        const target = new URL(saved, location.href);
+        const callback = new URL(location.href);
+        for (const [key, value] of target.searchParams) {
+          if (!callback.searchParams.has(key)) callback.searchParams.set(key, value);
+        }
+        callback.hash = target.hash;
+        sessionStorage.removeItem('immich-oauth-route');
+        history.replaceState(history.state, '', callback);
+      }
+      // SvelteKit decodes the complete fragment on startup. Preserve encoded
+      // delimiters in dynamic route segments through that one decoding pass.
+      if (location.hash.includes('%')) {
+        const startupUrl = new URL(location.href);
+        startupUrl.hash = startupUrl.hash.replaceAll('%', '%25');
+        history.replaceState(history.state, '', startupUrl);
+      }
+      if (!location.pathname.endsWith('/')) {
+        location.replace(location.pathname + '/' + location.search + location.hash);
+      }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <link rel="icon" type="image/x-icon" sizes="32x32" href="/favicon.ico" />
-    <link rel="icon" type="image/svg+xml" sizes="any" href="/icon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180.png" />
+    <link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="icon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180.png" />
     <link rel="preload" as="font" type="font/ttf" href="%app.font%" crossorigin="anonymous" />
     <link rel="preload" as="font" type="font/ttf" href="%app.monofont%" crossorigin="anonymous" />
 
@@ -77,7 +101,7 @@
           loadspin 8s linear infinite;
       }
     </style>
-    <link rel="stylesheet" href="/custom.css" />
+    <link rel="stylesheet" href="custom.css" />
   </head>
 
   <noscript style="position: absolute; top: 0px; z-index: 1000; color: black; background-color: white">

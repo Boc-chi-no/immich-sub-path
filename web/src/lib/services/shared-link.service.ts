@@ -4,6 +4,7 @@ import { getUserConfigQuery } from '#lib/queries/config-user.query.ts';
 import { removeSharedLinkMutation } from '#lib/queries/shared-link.query.ts';
 import { Route } from '#lib/route.ts';
 import { copyToClipboard } from '#lib/utils.ts';
+import { publicAppUrl } from '#lib/utils/hash-routing.ts';
 import { getFormatter } from '#lib/utils/i18n.ts';
 import { type SharedLinkResponseDto } from '@immich/sdk';
 import { modalManager, type ActionItem } from '@immich/ui';
@@ -50,9 +51,9 @@ export const getSharedLinkActions = ($t: MessageFormatter, sharedLink: SharedLin
   return { Edit, Delete, Copy, ViewQrCode };
 };
 
-export const asUrl = (sharedLink: SharedLinkResponseDto) => {
+export const asUrl = (sharedLink: SharedLinkResponseDto, current = location.href) => {
   const path = Route.viewSharedLink(sharedLink);
-  return new URL(path, readPreloadedQuery(getUserConfigQuery()).server.externalDomain || location.origin).href;
+  return publicAppUrl(path, readPreloadedQuery(getUserConfigQuery()).server.externalDomain, current).href;
 };
 
 export const showSharedLinkQrCode = async (sharedLink: SharedLinkResponseDto) => {

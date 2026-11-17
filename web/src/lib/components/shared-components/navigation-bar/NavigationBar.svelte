@@ -13,6 +13,7 @@
   import { getGlobalActions } from '#lib/services/app.service.ts';
   import { mediaQueryManager } from '#lib/stores/media-query-manager.svelte.ts';
   import { sidebarStore } from '#lib/stores/sidebar.svelte.ts';
+  import { routePath } from '#lib/utils/hash-routing.ts';
   import { ActionButton, Button, IconButton, Logo } from '@immich/ui';
   import { mdiBellBadge, mdiBellOutline, mdiMagnify, mdiMenu, mdiTrayArrowUp } from '@mdi/js';
   import { createQuery } from '@tanstack/svelte-query';
@@ -91,7 +92,7 @@
           aria-label={$t('go_to_search')}
         />
 
-        {#if !page.url.pathname.includes('/admin') && onUploadClick}
+        {#if !routePath(page.url).includes('/admin') && onUploadClick}
           <Button
             leadingIcon={mdiTrayArrowUp}
             onclick={onUploadClick}

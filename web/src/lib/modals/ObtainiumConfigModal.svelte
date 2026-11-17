@@ -1,11 +1,12 @@
 <script lang="ts">
   import { createApiKeyMutation } from '#lib/queries/api-key.query.ts';
   import { executeMutation } from '#lib/queries/client.ts';
+  import { appUrl } from '#lib/utils/hash-routing.ts';
   import { Permission } from '@immich/sdk';
   import { Button, Field, Input, Modal, ModalBody, Select, Text, obtainiumBadge } from '@immich/ui';
   import { t } from 'svelte-i18n';
 
-  let inputUrl = $state(location.origin);
+  let inputUrl = $state(appUrl('./').href.replace(/\/$/, ''));
   let inputApiKey = $state('');
   let archVariant = $state('');
   let obtainiumLink = $derived(

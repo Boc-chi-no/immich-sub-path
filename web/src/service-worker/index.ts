@@ -1,7 +1,7 @@
 import { installMessageListener } from './messaging';
 import { handleFetch as handleAssetFetch } from './request';
 
-const ASSET_REQUEST_REGEX = /^\/api\/assets\/[a-f0-9-]+\/(original|thumbnail)/;
+const ASSET_REQUEST_REGEX = /^api\/assets\/[a-f0-9-]+\/(original|thumbnail)/;
 
 const sw = globalThis as unknown as ServiceWorkerGlobalScope;
 
@@ -23,7 +23,10 @@ const handleFetch = (event: FetchEvent): void => {
 
   // Cache requests for thumbnails
   const url = new URL(event.request.url);
-  if (url.origin === globalThis.location.origin && ASSET_REQUEST_REGEX.test(url.pathname)) {
+  if (
+    url.origin === globalThis.location.origin &&
+    ASSET_REQUEST_REGEX.test(url.pathname.slice(new URL(sw.registration.scope).pathname.length))
+  ) {
     event.respondWith(handleAssetFetch(event.request));
     return;
   }

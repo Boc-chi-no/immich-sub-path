@@ -111,13 +111,18 @@ class AuthManager {
       // noop
     }
 
-    if (redirectUri.startsWith('/')) {
+    if (
+      redirectUri.startsWith('./') ||
+      redirectUri.startsWith('/') ||
+      redirectUri.startsWith('#') ||
+      redirectUri.startsWith('?')
+    ) {
       this.isPurchased = false;
 
       this.reset();
       eventManager.emit('AuthLogout');
 
-      await goto(redirectUri);
+      await goto(Route.continue(redirectUri, Route.login()));
     } else {
       location.assign(redirectUri);
     }

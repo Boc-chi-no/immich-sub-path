@@ -1,4 +1,5 @@
 import { OpenQueryParam, type SharedLinkTab } from '#lib/constants.ts';
+import { appUrl, toHashRoute } from '#lib/utils/hash-routing.ts';
 import { IntegrityReport, QueueName, getBaseUrl, type MetadataSearchDto, type SmartSearchDto } from '@immich/sdk';
 import { omitBy } from 'lodash-es';
 
@@ -34,123 +35,132 @@ const asQueryString = (params?: Record<string, QueryValue | undefined>) => {
   return items.length === 0 ? '' : `?${items.join('&')}`;
 };
 
+const asSearchQuery = (dto?: MetadataSearchDto | SmartSearchDto) => {
+  const metadata = omitBy(dto ?? {}, (value) => value === undefined);
+  const query = Object.keys(metadata).length === 0 ? undefined : JSON.stringify(metadata);
+  return asQueryString({ query });
+};
+
 export const Route = {
+  home: () => toHashRoute('/'),
+
   // auth
-  login: (params?: { continue?: string; autoLaunch?: 0 | 1 }) => '/auth/login' + asQueryString(params),
-  logout: (params?: { continue?: string }) => '/auth/logout' + asQueryString(params),
-  register: () => '/auth/register',
-  changePassword: () => '/auth/change-password',
-  onboarding: (params?: { step?: string }) => '/auth/onboarding' + asQueryString(params),
-  pinPrompt: (params?: { continue?: string }) => '/auth/pin-prompt' + asQueryString({ continue: params?.continue }),
+  login: (params?: { continue?: string; autoLaunch?: 0 | 1 }) => toHashRoute('/auth/login' + asQueryString(params)),
+  logout: (params?: { continue?: string }) => toHashRoute('/auth/logout' + asQueryString(params)),
+  register: () => toHashRoute('/auth/register'),
+  changePassword: () => toHashRoute('/auth/change-password'),
+  onboarding: (params?: { step?: string }) => toHashRoute('/auth/onboarding' + asQueryString(params)),
+  pinPrompt: (params?: { continue?: string }) =>
+    toHashRoute('/auth/pin-prompt' + asQueryString({ continue: params?.continue })),
 
   // albums
-  albums: () => '/albums',
-  viewAlbum: ({ id }: { id: string }) => `/albums/${id}`,
+  albums: () => toHashRoute('/albums'),
+  viewAlbum: ({ id }: { id: string }, params?: { at?: string }) => toHashRoute(`/albums/${id}` + asQueryString(params)),
   viewAlbumAsset: ({ albumId, assetId }: { albumId: string; assetId: string }) =>
-    `/albums/${albumId}/photos/${assetId}`,
+    toHashRoute(`/albums/${albumId}/photos/${assetId}`),
 
   // buy
-  buy: () => '/buy',
+  buy: () => toHashRoute('/buy'),
 
   // explore
-  explore: () => '/explore',
-  places: () => '/places',
+  explore: () => toHashRoute('/explore'),
+  places: () => toHashRoute('/places'),
 
   // folders
-  folders: (params?: { path?: string }) => '/folders' + asQueryString(params),
+  folders: (params?: { path?: string }) => toHashRoute('/folders' + asQueryString(params)),
 
   // libraries
-  libraries: () => '/admin/library-management',
-  newLibrary: () => '/admin/library-management/new',
-  viewLibrary: ({ id }: { id: string }) => `/admin/library-management/${id}`,
-  editLibrary: ({ id }: { id: string }) => `/admin/library-management/${id}/edit`,
+  libraries: () => toHashRoute('/admin/library-management'),
+  newLibrary: () => toHashRoute('/admin/library-management/new'),
+  viewLibrary: ({ id }: { id: string }) => toHashRoute(`/admin/library-management/${id}`),
+  editLibrary: ({ id }: { id: string }) => toHashRoute(`/admin/library-management/${id}/edit`),
 
   // maintenance
-  maintenanceMode: (params?: { continue?: string }) => '/maintenance' + asQueryString(params),
+  maintenanceMode: (params?: { continue?: string }) => toHashRoute('/maintenance' + asQueryString(params)),
 
   // map
   map: (point?: { zoom: number; lat: number; lng: number }) =>
-    '/map' + (point ? `#${point.zoom}/${point.lat}/${point.lng}` : ''),
+    toHashRoute('/map' + asQueryString(point ? { position: `${point.zoom}/${point.lat}/${point.lng}` } : undefined)),
 
   // memories
-  memories: (params?: { isSaved?: boolean }) => '/memories' + asQueryString(params),
+  memories: (params?: { isSaved?: boolean }) => toHashRoute('/memories' + asQueryString(params)),
   viewMemory: ({ id, ...params }: { id: string; assetId?: string; isSaved?: boolean }) =>
-    `/memories/${id}` + asQueryString(params),
+    toHashRoute(`/memories/${id}` + asQueryString(params)),
   viewMemoryAsset: ({ id, assetId, ...params }: { id: string; assetId: string; isSaved?: boolean }) =>
-    `/memories/${id}/photos/${assetId}` + asQueryString({ assetId, ...params }),
+    toHashRoute(`/memories/${id}/photos/${assetId}` + asQueryString({ assetId, ...params })),
 
   // partners
-  viewPartner: ({ id }: { id: string }) => `/partners/${id}`,
+  viewPartner: ({ id }: { id: string }) => toHashRoute(`/partners/${id}`),
 
   // people
-  people: () => '/people',
+  managePeople: () => toHashRoute('/people/manage'),
+  people: () => toHashRoute('/people'),
   viewPerson: ({ id }: { id: string }, params?: { previousRoute?: string; action?: 'merge' }) =>
-    `/people/${id}` + asQueryString(params),
+    toHashRoute(`/people/${id}` + asQueryString(params)),
 
   // photos
-  photos: (params?: { at?: string }) => '/photos' + asQueryString(params),
-  viewAsset: ({ id }: { id: string }) => `/photos/${id}`,
-  archive: () => '/archive',
-  favorites: () => '/favorites',
-  locked: () => '/locked',
-  trash: () => '/trash',
-  viewTrashedAsset: ({ id }: { id: string }) => `/trash/photos/${id}`,
-  recentlyAdded: () => '/recently-added',
+  photos: (params?: { at?: string }) => toHashRoute('/photos' + asQueryString(params)),
+  viewAsset: ({ id }: { id: string }) => toHashRoute(`/photos/${id}`),
+  archive: () => toHashRoute('/archive'),
+  favorites: () => toHashRoute('/favorites'),
+  locked: () => toHashRoute('/locked'),
+  trash: () => toHashRoute('/trash'),
+  viewTrashedAsset: ({ id }: { id: string }) => toHashRoute(`/trash/photos/${id}`),
+  recentlyAdded: () => toHashRoute('/recently-added'),
 
   // search
-  search: (dto?: MetadataSearchDto | SmartSearchDto) => {
-    const metadata = omitBy(dto ?? {}, (value) => value === undefined);
-    const query = Object.keys(metadata).length === 0 ? undefined : JSON.stringify(metadata);
-    return `/search` + asQueryString({ query });
-  },
+  search: (dto?: MetadataSearchDto | SmartSearchDto) => toHashRoute('/search' + asSearchQuery(dto)),
+  viewSearchAsset: ({ id }: { id: string }, dto?: MetadataSearchDto | SmartSearchDto) =>
+    toHashRoute(`/search/photos/${id}` + asSearchQuery(dto)),
 
   // sharing
-  sharing: () => '/sharing',
+  sharing: () => toHashRoute('/sharing'),
 
   // shared links
-  sharedLinks: (params?: { filter?: SharedLinkTab }) => '/shared-links' + asQueryString(params),
-  editSharedLink: ({ id }: { id: string }) => `/shared-links/${id}/edit`,
+  sharedLinks: (params?: { filter?: SharedLinkTab }) => toHashRoute('/shared-links' + asQueryString(params)),
+  editSharedLink: ({ id }: { id: string }) => toHashRoute(`/shared-links/${id}/edit`),
   viewSharedLink: ({ slug, key }: { slug?: string | null; key: string }) =>
-    slug ? `/s/${encodeURIComponent(slug)}` : `/share/${key}`,
+    toHashRoute(slug ? `/s/${encodeURIComponent(slug)}` : `/share/${key}`),
 
   // settings
-  userSettings: (params?: { isOpen?: OpenQueryParam }) => '/user-settings' + asQueryString(params),
+  userSettings: (params?: { isOpen?: OpenQueryParam }) => toHashRoute('/user-settings' + asQueryString(params)),
 
   // system
-  systemSettings: (params?: { isOpen?: OpenQueryParam }) => '/admin/system-settings' + asQueryString(params),
-  systemStatistics: () => '/admin/server-status',
-  systemMaintenance: (params?: { continue?: string }) => '/admin/maintenance' + asQueryString(params),
+  systemSettings: (params?: { isOpen?: OpenQueryParam }) =>
+    toHashRoute('/admin/system-settings' + asQueryString(params)),
+  systemStatistics: () => toHashRoute('/admin/server-status'),
+  systemMaintenance: (params?: { continue?: string }) => toHashRoute('/admin/maintenance' + asQueryString(params)),
   systemMaintenanceIntegrityReport: ({ reportType }: { reportType: IntegrityReport }) =>
-    `/admin/maintenance/integrity-report/${reportType}`,
+    toHashRoute(`/admin/maintenance/integrity-report/${reportType}`),
 
   // tags
-  tags: (params?: { path?: string }) => '/tags' + asQueryString(params),
+  tags: (params?: { path?: string }) => toHashRoute('/tags' + asQueryString(params)),
 
   // users
-  users: () => '/admin/users',
-  newUser: () => `/admin/users/new`,
-  viewUser: ({ id }: { id: string }) => `/admin/users/${id}`,
-  editUser: ({ id }: { id: string }) => `/admin/users/${id}/edit`,
+  users: () => toHashRoute('/admin/users'),
+  newUser: () => toHashRoute(`/admin/users/new`),
+  viewUser: ({ id }: { id: string }) => toHashRoute(`/admin/users/${id}`),
+  editUser: ({ id }: { id: string }) => toHashRoute(`/admin/users/${id}/edit`),
 
   // utilities
-  utilities: () => '/utilities',
-  duplicatesUtility: (params?: { index?: number }) => '/utilities/duplicates' + asQueryString(params),
-  largeFileUtility: () => '/utilities/large-files',
-  geolocationUtility: () => '/utilities/geolocation',
+  utilities: () => toHashRoute('/utilities'),
+  duplicatesUtility: (params?: { index?: number }) => toHashRoute('/utilities/duplicates' + asQueryString(params)),
+  largeFileUtility: () => toHashRoute('/utilities/large-files'),
+  geolocationUtility: () => toHashRoute('/utilities/geolocation'),
 
   // workflows
-  workflows: () => '/workflows',
-  viewWorkflow: ({ id }: { id: string }) => `/workflows/${id}`,
+  workflows: () => toHashRoute('/workflows'),
+  viewWorkflow: ({ id }: { id: string }) => toHashRoute(`/workflows/${id}`),
 
   // backups
-  backups: () => '/admin/backups',
-  backupSettings: () => '/admin/backups/settings',
-  backupAttempts: () => '/admin/backups/attempts',
-  backupSnapshots: () => '/admin/backups/snapshots',
+  backups: () => toHashRoute('/admin/backups'),
+  backupSettings: () => toHashRoute('/admin/backups/settings'),
+  backupAttempts: () => toHashRoute('/admin/backups/attempts'),
+  backupSnapshots: () => toHashRoute('/admin/backups/snapshots'),
 
   // queues
-  queues: () => '/admin/queues',
-  viewQueue: ({ name }: { name: QueueName }) => `/admin/queues/${asQueueSlug(name)}`,
+  queues: () => toHashRoute('/admin/queues'),
+  viewQueue: ({ name }: { name: QueueName }) => toHashRoute(`/admin/queues/${asQueueSlug(name)}`),
 
   // integrity checks
   integrityReportFile: (reportId: string) => `${getBaseUrl()}/admin/integrity/report/${reportId}/file`,
@@ -158,13 +168,14 @@ export const Route = {
 
   // continue helper for ensuring same-origin URLs
   continue: (url: string | null, fallback: string): string | URL => {
-    const resolved = new URL(url ?? fallback, document.baseURI);
+    const resolved = appUrl(url ?? fallback);
 
     if (resolved.origin !== location.origin) {
       return fallback;
     }
 
-    return resolved;
+    // Accept legacy same-origin paths, but always stay in the hash router.
+    return resolved.hash.startsWith('#/') ? resolved : appUrl(toHashRoute(resolved.pathname + resolved.search));
   },
 };
 

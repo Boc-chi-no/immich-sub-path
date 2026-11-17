@@ -3,6 +3,7 @@ import { authManager } from '#lib/managers/auth-manager.svelte.ts';
 import { alwaysLoadOriginalFile, lang, locale } from '#lib/stores/preferences.store.ts';
 import { isWebCompatibleImage } from '#lib/utils/asset-utils.ts';
 import { handleError } from '#lib/utils/handle-error.ts';
+import { appUrl, routeHref } from '#lib/utils/hash-routing.ts';
 import { convertBCP47, langs } from '#lib/utils/i18n.ts';
 import {
   AssetMediaSize,
@@ -348,7 +349,9 @@ export const oauth = {
   authorize: async (location: Location) => {
     const $t = get(t);
     try {
-      const redirectUri = location.href.split('?', 1)[0];
+      // OAuth redirect URIs cannot contain fragments. Restore the route on callback.
+      sessionStorage.setItem('immich-oauth-route', routeHref(location));
+      const redirectUri = appUrl('./').href;
       const { url } = await startOAuth({ oAuthConfigDto: { redirectUri } });
       globalThis.location.assign(url);
       return true;
@@ -358,10 +361,10 @@ export const oauth = {
     }
   },
   login: (location: Location) => {
-    return finishOAuth({ oAuthCallbackDto: { url: location.href } });
+    return finishOAuth({ oAuthCallbackDto: { url: location.href.split('#', 1)[0] } });
   },
   link: (location: Location) => {
-    return linkOAuthAccount({ oAuthCallbackDto: { url: location.href } });
+    return linkOAuthAccount({ oAuthCallbackDto: { url: location.href.split('#', 1)[0] } });
   },
   unlink: () => {
     return unlinkOAuthAccount();

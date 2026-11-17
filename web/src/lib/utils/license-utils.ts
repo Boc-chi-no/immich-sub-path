@@ -3,6 +3,7 @@ import { authManager } from '#lib/managers/auth-manager.svelte.ts';
 import { queryClient, readPreloadedQuery } from '#lib/queries/client.ts';
 import { getUserConfigQuery } from '#lib/queries/config-user.query.ts';
 import { getAboutInfoQuery } from '#lib/queries/server-info.query.ts';
+import { publicAppUrl } from '#lib/utils/hash-routing.ts';
 import { setServerLicense, setUserLicense, type LicenseResponseDto } from '@immich/sdk';
 import { PUBLIC_IMMICH_BUY_HOST, PUBLIC_IMMICH_PAY_HOST } from '$app/env/public';
 
@@ -36,7 +37,7 @@ export const getLicenseLink = (license: ImmichProduct) => {
   url.searchParams.append('productId', license);
   url.searchParams.append(
     'instanceUrl',
-    readPreloadedQuery(getUserConfigQuery()).server.externalDomain || globalThis.origin,
+    publicAppUrl('./', readPreloadedQuery(getUserConfigQuery()).server.externalDomain).href,
   );
   return url.href;
 };

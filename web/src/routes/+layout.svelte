@@ -5,10 +5,10 @@
   import { eventManager } from '#lib/managers/event-manager.svelte.ts';
   import ServerRestartingModal from '#lib/modals/ServerRestartingModal.svelte';
   import { queryClient } from '#lib/queries/client.ts';
-  import { Route } from '#lib/route.ts';
   import { lang, locale } from '#lib/stores/preferences.store.ts';
   import { sidebarStore } from '#lib/stores/sidebar.svelte.ts';
   import { closeWebsocketConnection, openWebsocketConnection, websocketStore } from '#lib/stores/websocket.ts';
+  import { routePath } from '#lib/utils/hash-routing.ts';
   import { maintenanceShouldRedirect } from '#lib/utils/maintenance.ts';
   import { getUiTranslations } from '#lib/utils/ui-translations.ts';
   import { getServerConfig } from '@immich/sdk';
@@ -179,7 +179,7 @@
   const { serverRestarting } = websocketStore;
 
   $effect.pre(() => {
-    if (authManager.authenticated || $serverRestarting || page.url.pathname.startsWith(Route.maintenanceMode())) {
+    if (authManager.authenticated || $serverRestarting || routePath(page.url).startsWith('/maintenance')) {
       openWebsocketConnection();
     } else {
       closeWebsocketConnection();
@@ -213,7 +213,7 @@
 
 <svelte:head>
   <title>{page.data.meta?.title || 'Web'} - Immich</title>
-  <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+  <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
   <meta name="theme-color" content="white" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="black" media="(prefers-color-scheme: dark)" />
 </svelte:head>
