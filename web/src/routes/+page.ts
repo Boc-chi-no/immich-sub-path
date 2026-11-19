@@ -7,9 +7,6 @@ import { getFormatter } from '#lib/utils/i18n.ts';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
-export const ssr = false;
-export const csr = true;
-
 export const load = (async ({ fetch }) => {
   try {
     await init(fetch);

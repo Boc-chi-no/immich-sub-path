@@ -11,9 +11,6 @@ import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import type { LayoutLoad } from './$types';
 
-export const ssr = false;
-export const csr = true;
-
 export const load = (async ({ fetch, url }) => {
   configureYucca({ api: 'orchestrator', language: convertBCP47(get(lang)) });
 

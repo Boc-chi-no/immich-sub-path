@@ -41,7 +41,7 @@
 
         const data = JSON.parse(notification.data);
         if (data?.albumId) {
-          await goto(`/albums/${data.albumId}`);
+          await goto(Route.viewAlbum({ id: data.albumId }));
         }
 
         break;

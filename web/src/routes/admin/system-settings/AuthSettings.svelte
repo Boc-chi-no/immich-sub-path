@@ -28,7 +28,7 @@
     // click runs before bind
     const previouslyEnabled = configToEdit.oauth.mobileOverrideEnabled;
     if (!previouslyEnabled && !configToEdit.oauth.mobileRedirectUri) {
-      configToEdit.oauth.mobileRedirectUri = location.origin + '/api/oauth/mobile-redirect';
+      configToEdit.oauth.mobileRedirectUri = new URL('api/oauth/mobile-redirect', location.href).href;
     }
   };
 

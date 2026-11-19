@@ -47,7 +47,8 @@
     Popup,
     ScaleControl,
   } from 'svelte-maplibre';
-  import { afterNavigate } from '$app/navigation';
+  import { afterNavigate, goto } from '$app/navigation';
+  import { page } from '$app/state';
   import type { SelectionBBox } from './types';
 
   const query = createPreloadedQuery(getPublicConfigQuery);
@@ -96,6 +97,22 @@
     showSimpleControls = true,
     autoFitBounds = true,
   }: Props = $props();
+
+  if (hash) {
+    const position = page.url.searchParams.get('position')?.split('/').map(Number);
+    if (position?.length === 3 && position.every((value) => Number.isFinite(value))) {
+      [zoom] = position;
+      center = [position[2], position[1]];
+    }
+  }
+
+  const updatePosition = () => {
+    if (!hash || !map) return;
+    const { lat, lng } = map.getCenter();
+    const url = new URL(page.url.href);
+    url.searchParams.set('position', `${map.getZoom().toFixed(2)}/${lat.toFixed(5)}/${lng.toFixed(5)}`);
+    handlePromiseError(goto(url, { replace: true, shallow: true, reset: false }));
+  };
 
   // Calculate initial bounds from markers once during initialization
   const initialBounds = (() => {
@@ -276,10 +293,11 @@
 
     map.resize();
 
-    if (location.hash) {
-      const hashChangeEvent = new HashChangeEvent('hashchange');
-      // eslint-disable-next-line unicorn/no-unnecessary-global-this
-      globalThis.dispatchEvent(hashChangeEvent);
+    if (hash) {
+      const position = page.url.searchParams.get('position')?.split('/').map(Number);
+      if (position?.length === 3 && position.every((value) => Number.isFinite(value))) {
+        map.jumpTo({ zoom: position[0], center: [position[2], position[1]] });
+      }
     }
   });
 
@@ -375,7 +393,7 @@
 <svelte:boundary>
   <!--  We handle style loading ourselves so we set style blank here -->
   <MapLibre
-    {hash}
+    hash={false}
     style=""
     class="h-full {rounded ? 'rounded-2xl' : 'rounded-none'}"
     {zoom}
@@ -388,6 +406,7 @@
       event.setMaxZoom(18);
       event.on('click', handleMapClick);
       event.on('moveend', handleMoveEnd);
+      event.on('moveend', updatePosition);
       if (!simplified) {
         event.addControl(new GlobeControl(), 'top-left');
       }

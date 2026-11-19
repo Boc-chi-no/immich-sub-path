@@ -5,7 +5,8 @@
   import ThemeButton from '#lib/components/shared-components/ThemeButton.svelte';
   import { assetViewerManager } from '#lib/managers/asset-viewer-manager.svelte.ts';
   import { authManager } from '#lib/managers/auth-manager.svelte.ts';
-  import { setSharedLink } from '#lib/utils.ts';
+  import { Route } from '#lib/route.ts';
+  import { getSharedLink, setSharedLink } from '#lib/utils.ts';
   import { handleError } from '#lib/utils/handle-error.ts';
   import { navigate } from '#lib/utils/navigation.ts';
   import { SharedLinkType, sharedLinkLogin, type AssetResponseDto, type SharedLinkResponseDto } from '@immich/sdk';
@@ -60,7 +61,10 @@
   };
 
   onDestroy(() => {
-    setSharedLink(undefined);
+    // Another link may already have loaded before this component is destroyed.
+    if (getSharedLink()?.id === sharedLink?.id) {
+      setSharedLink(undefined);
+    }
   });
 </script>
 
@@ -87,7 +91,7 @@
   <header>
     <ControlAppBar>
       {#snippet leading()}
-        <a data-sveltekit-preload-data="hover" class="ms-4" href="/">
+        <a data-sveltekit-preload-data="hover" class="ms-4" href={Route.home()}>
           <Logo variant="inline" />
         </a>
       {/snippet}

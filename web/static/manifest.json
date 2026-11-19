@@ -19,20 +19,21 @@
   ],
   "lang": "en",
   "name": "Immich",
+  "scope": "./",
   "short_name": "Immich",
   "shortcuts": [
     {
       "name": "Photos",
-      "url": "/photos"
+      "url": "./#/photos"
     },
     {
       "name": "Albums",
-      "url": "/albums"
+      "url": "./#/albums"
     },
     {
       "name": "Map",
-      "url": "/map"
+      "url": "./#/map"
     }
   ],
-  "start_url": "/"
+  "start_url": "./#/"
 }

@@ -1,5 +1,6 @@
 import { assetCacheManager } from '#lib/managers/AssetCacheManager.svelte.ts';
 import { Route } from '#lib/route.ts';
+import { appUrl, routeHref, routePath, toHashRoute } from '#lib/utils/hash-routing.ts';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 import type { RouteId } from '$app/types';
@@ -27,12 +28,15 @@ export function getAssetInfoFromParam({ assetId, slug, key }: { assetId?: string
 function currentUrlWithoutAsset() {
   // This contains special casing for the /photos/:assetId route, which hangs directly
   // off / instead of a subpath, unlike every other asset-containing route.
-  if (isPhotosRoute(page.route.id)) {
-    return Route.photos() + page.url.search;
-  }
-  return isSharedLinkSlugRoute(page.route.id)
-    ? Route.viewSharedLink({ slug: page.data.slug, key: page.data.key }) + page.url.search
-    : page.url.pathname.replace(/(\/photos.*)$/, '') + page.url.search;
+  const url = appUrl(
+    isPhotosRoute(page.route.id)
+      ? Route.photos()
+      : isSharedLinkSlugRoute(page.route.id)
+        ? Route.viewSharedLink({ slug: page.data.slug, key: page.data.key })
+        : toHashRoute(routePath(page.url).replace(/(\/photos.*)$/, '')),
+  );
+  url.search = page.url.search;
+  return routeHref(url);
 }
 
 export function currentUrlReplaceAssetId(assetId: string) {
@@ -44,29 +48,31 @@ export function currentUrlReplaceAssetId(assetId: string) {
   // this contains special casing for the /photos/:assetId photos route, which hangs directly
   // off / instead of a subpath, unlike every other asset-containing route.
   return isPhotosRoute(page.route.id)
-    ? `${Route.viewAsset({ id: assetId })}${searchparams}`
-    : `${page.url.pathname.replace(/\/photos\/[^/]+$/, '')}/photos/${assetId}${searchparams}`;
+    ? toHashRoute(`/photos/${assetId}${searchparams}`)
+    : toHashRoute(`${routePath(page.url).replace(/\/photos\/[^/]+$/, '')}/photos/${assetId}${searchparams}`);
 }
 
 function replaceScrollTarget(url: string, searchParams?: AssetGridRouteSearchParams | null) {
-  const parsed = new URL(url, page.url.href);
+  const parsed = appUrl(url, page.url.href);
 
   const { at: assetId } = searchParams || { at: null };
 
   if (!assetId) {
-    return parsed.pathname;
+    parsed.search = '';
+    return routeHref(parsed);
   }
 
   const params = new URLSearchParams(page.url.search);
   if (assetId) {
     params.set('at', assetId);
   }
-  return parsed.pathname + '?' + params.toString();
+  parsed.search = params.toString();
+  return routeHref(parsed);
 }
 
 function currentUrl() {
   const current = page.url;
-  return current.pathname + current.search + current.hash;
+  return routeHref(current);
 }
 
 interface Route {

@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { stripVTControlCharacters } from 'node:util';
+import { relativizeAssets } from './relative-assets.ts';
 
 const buildDir = 'build';
 const inlineTags = ['script', 'style'];
@@ -41,6 +42,7 @@ const cspManifest = (): Plugin => ({
   buildApp: {
     order: 'post',
     async handler() {
+      await relativizeAssets(buildDir);
       const indexHtml = path.join(buildDir, 'index.html');
       const hashes: Record<string, Set<string>> = Object.fromEntries(
         inlineTags.map((tag) => [`${tag}-src`, new Set()]),
@@ -152,7 +154,8 @@ export default defineConfig({
       version: {
         name: process.env.IMMICH_BUILD || process.env.npm_package_version || 'local',
       },
-      paths: { relative: false },
+      router: { type: 'hash' },
+      paths: { relative: true },
       adapter: adapter({ fallback: 'index.html', precompress: true }),
       onwarn: (warning, handler) => {
         if (warning.code === 'state_referenced_locally') {

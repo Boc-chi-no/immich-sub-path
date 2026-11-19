@@ -2,6 +2,7 @@ import { QueryParameter, UUID_REGEX } from '#lib/constants.ts';
 import { memoryManager } from '#lib/managers/memory-manager.svelte.ts';
 import { Route } from '#lib/route.ts';
 import { authenticate } from '#lib/utils/auth.ts';
+import { routeHref } from '#lib/utils/hash-routing.ts';
 import { getFormatter } from '#lib/utils/i18n.ts';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
@@ -40,7 +41,7 @@ export const load = (async ({ url, params }) => {
   if (url.searchParams.get(QueryParameter.ASSET_ID) !== assetId) {
     const target = new URL(url);
     target.searchParams.set(QueryParameter.ASSET_ID, assetId);
-    redirect(307, target.pathname + target.search);
+    redirect(307, routeHref(target));
   }
 
   return {

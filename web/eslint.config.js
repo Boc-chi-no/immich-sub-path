@@ -74,6 +74,7 @@ export default defineConfig(
       'tailwind.config.js',
       'coverage',
       'vite.config.ts',
+      'relative-assets.ts',
       'playwright.config.ts',
       '**/service-worker/**',
     ],

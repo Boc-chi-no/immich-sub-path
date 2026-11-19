@@ -10,6 +10,7 @@
   import { TimelineManager } from '#lib/managers/timeline-manager/timeline-manager.svelte.ts';
   import { createPreloadedQuery } from '#lib/queries/client.ts';
   import { getPublicConfigQuery } from '#lib/queries/config-public.query.ts';
+  import { Route } from '#lib/route.ts';
   import { handleDownloadAlbum } from '#lib/services/album.service.ts';
   import { getGlobalActions } from '#lib/services/app.service.ts';
   import { dragAndDropFilesStore } from '#lib/stores/drag-and-drop-files.store.ts';
@@ -111,7 +112,7 @@
   {:else}
     <ControlAppBar>
       {#snippet leading()}
-        <a data-sveltekit-preload-data="hover" class="ms-4" href="/">
+        <a data-sveltekit-preload-data="hover" class="ms-4" href={Route.home()}>
           <Logo variant={mediaQueryManager.maxMd ? 'icon' : 'inline'} class="min-w-10" />
         </a>
       {/snippet}

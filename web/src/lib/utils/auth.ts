@@ -1,5 +1,6 @@
 import { authManager } from '#lib/managers/auth-manager.svelte.ts';
 import { Route } from '#lib/route.ts';
+import { routeHref } from '#lib/utils/hash-routing.ts';
 import { redirect } from '@sveltejs/kit';
 import { DateTime } from 'luxon';
 
@@ -17,7 +18,7 @@ export const authenticate = async (url: URL, options?: AuthOptions) => {
   }
 
   if (!authManager.authenticated) {
-    redirect(307, Route.login({ continue: url.pathname + url.search }));
+    redirect(307, Route.login({ continue: routeHref(url) }));
   }
 
   if (adminRoute && !authManager.user.isAdmin) {

@@ -3,6 +3,7 @@ import { readPreloadedQuery } from '#lib/queries/client.ts';
 import { getUserConfigQuery } from '#lib/queries/config-user.query.ts';
 import { Route } from '#lib/route.ts';
 import { copyToClipboard } from '#lib/utils.ts';
+import { routePath } from '#lib/utils/hash-routing.ts';
 import { ThemePreference, defaultProvider, screencastManager, themeManager, type ActionItem } from '@immich/ui';
 import {
   mdiAccountMultipleOutline,
@@ -211,7 +212,7 @@ export const getPagesProvider = ($t: MessageFormatter) => {
 };
 
 const getMyImmichLink = () => {
-  return new URL(page.url.pathname + page.url.search, 'https://my.immich.app');
+  return new URL(routePath(page.url) + page.url.search, 'https://my.immich.app');
 };
 
 export const getSettingsProvider = ($t: MessageFormatter) => {

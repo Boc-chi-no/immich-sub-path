@@ -1,18 +1,19 @@
 import { Route } from '#lib/route.ts';
 import { maintenanceStore } from '#lib/stores/maintenance.store.ts';
 import { websocketStore } from '#lib/stores/websocket.ts';
+import { appUrl, routeHref, routePath } from '#lib/utils/hash-routing.ts';
 import { MaintenanceAction, getMaintenanceStatus, maintenanceLogin } from '@immich/sdk';
 
 export function maintenanceCreateUrl(url: URL) {
-  return new URL(Route.maintenanceMode({ continue: url.pathname + url.search }), url.origin).href;
+  return appUrl(Route.maintenanceMode({ continue: routeHref(url) })).href;
 }
 
 export function maintenanceReturnUrl(searchParams: URLSearchParams) {
-  return Route.continue(searchParams.get('continue'), '/');
+  return Route.continue(searchParams.get('continue'), Route.home());
 }
 
 export function maintenanceShouldRedirect(maintenanceMode: boolean, currentUrl: URL | Location) {
-  return maintenanceMode !== currentUrl.pathname.startsWith(Route.maintenanceMode());
+  return maintenanceMode !== routePath(currentUrl).startsWith('/maintenance');
 }
 
 export const loadMaintenanceAuth = async () => {
